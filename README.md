@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sereno: AI-Driven Digital Well-Being & Community Platform
 
 A full-stack AI-powered web platform that helps users reflect on their daily thoughts and experiences through text while receiving intelligent insights, mood-improving suggestions, and community support.
@@ -70,3 +71,7 @@ sereno/
 ## License
 
 MIT License
+=======
+# SERENO-An-AI-Driven-Digital-Well-Being-Analytics-Platform
+In today’s digital world, people generate large amounts of text data, but few systems turn it into meaningful, personalized insights. Most platforms offer generic suggestions without trend analysis or community support, creating a need for a unified AI-driven solution that enables smarter insights and better user interaction.
+>>>>>>> 4014fd58d3ff39c6ca542a839e6e83c16e3cc8b2
