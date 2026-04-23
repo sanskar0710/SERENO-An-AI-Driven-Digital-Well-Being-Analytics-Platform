@@ -7,6 +7,7 @@ import { Send, Users, MessageCircle, Search } from 'lucide-react'
 import { useAuthStore } from '@/lib/store'
 import { chatAPI } from '@/lib/api'
 import { formatDateTime, truncateText } from '@/lib/utils'
+import { AppNav } from '@/app/dashboard/page'
 
 interface Message {
   id: string
@@ -37,41 +38,15 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetchConversations()
-    // Mock some sample conversations for demo
-    setConversations([
-      {
-        user_id: "user-2",
-        username: "Alice",
-        full_name: "Alice Johnson",
-        last_message: "Hey! How are you doing today?",
-        last_timestamp: new Date(Date.now() - 3600000).toISOString(),
-        unread_count: 2
-      },
-      {
-        user_id: "user-3", 
-        username: "Bob",
-        full_name: "Bob Smith",
-        last_message: "Thanks for asking about my day. It's been pretty good!",
-        last_timestamp: new Date(Date.now() - 7200000).toISOString(),
-        unread_count: 0
-      },
-      {
-        user_id: "support-bot",
-        username: "Sereno Support",
-        full_name: "AI Assistant",
-        last_message: "Welcome to Sereno Chat! How can I help you today?",
-        last_timestamp: new Date(Date.now() - 86400000).toISOString(),
-        unread_count: 1
-      }
-    ])
-    setIsLoading(false)
+    loadConversations()
   }, [])
 
-  const fetchConversations = async () => {
+  const loadConversations = async () => {
     try {
       const response = await chatAPI.getConversations()
-      setConversations(response.data)
+      if (Array.isArray(response.data)) {
+        setConversations(response.data)
+      }
     } catch (error) {
       console.error('Failed to fetch conversations:', error)
     } finally {
@@ -79,12 +54,17 @@ export default function ChatPage() {
     }
   }
 
+  const fetchConversations = async () => {
+    // Handled by loadConversations
+  }
+
   const fetchMessages = async (userId: string) => {
     try {
       const response = await chatAPI.getMessages(userId)
-      setMessages(response.data)
+      setMessages(Array.isArray(response.data) ? response.data : [])
     } catch (error) {
       console.error('Failed to fetch messages:', error)
+      setMessages([])
     }
   }
 
@@ -131,13 +111,14 @@ export default function ChatPage() {
   const selectedConvData = conversations.find(conv => conv.user_id === selectedConversation)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <AppNav />
       {/* Background shapes */}
       <div className="floating-shape shape-1"></div>
       <div className="floating-shape shape-2"></div>
       <div className="floating-shape shape-3"></div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10 p-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -255,8 +236,9 @@ export default function ChatPage() {
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
                             handleSendMessage()
                           }
                         }}

@@ -6,6 +6,8 @@ import { Heart, Plus, Calendar, Brain, TrendingUp, Search, Filter } from 'lucide
 import { useAuthStore } from '@/lib/store'
 import { journalAPI } from '@/lib/api'
 import { formatDate, formatDateTime, getEmotionColor, getEmotionIcon, truncateText } from '@/lib/utils'
+import { AppNav } from '@/app/dashboard/page'
+import toast from 'react-hot-toast'
 
 interface JournalEntry {
   id: string
@@ -47,9 +49,10 @@ export default function JournalPage() {
   const fetchEntries = async () => {
     try {
       const response = await journalAPI.getEntries()
-      setEntries(response.data)
+      setEntries(Array.isArray(response.data) ? response.data : [])
     } catch (error) {
       console.error('Failed to fetch journal entries:', error)
+      setEntries([])
     } finally {
       setIsLoading(false)
     }
@@ -68,6 +71,7 @@ export default function JournalPage() {
 
       const response = await journalAPI.createEntry(entryData)
       setEntries([response.data, ...entries])
+      toast.success('Journal entry saved! AI analysis complete ✨')
       
       // Reset form
       setNewEntry({
@@ -79,6 +83,7 @@ export default function JournalPage() {
       setShowNewEntry(false)
     } catch (error) {
       console.error('Failed to create entry:', error)
+      toast.error('Failed to save entry. Please try again.')
     }
   }
 
@@ -105,12 +110,13 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <AppNav />
       {/* Background shapes */}
       <div className="floating-shape shape-1"></div>
       <div className="floating-shape shape-2"></div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10 p-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

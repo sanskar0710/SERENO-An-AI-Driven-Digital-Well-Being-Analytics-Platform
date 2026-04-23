@@ -6,6 +6,8 @@ import { Heart, MessageCircle, Users, Plus, Search, Filter, Share2, Eye } from '
 import { useAuthStore } from '@/lib/store'
 import { communityAPI } from '@/lib/api'
 import { formatDate, formatDateTime, truncateText } from '@/lib/utils'
+import { AppNav } from '@/app/dashboard/page'
+import toast from 'react-hot-toast'
 
 interface CommunityPost {
   id: string
@@ -50,9 +52,10 @@ export default function CommunityPage() {
   const fetchPosts = async () => {
     try {
       const response = await communityAPI.getPosts()
-      setPosts(response.data)
+      setPosts(Array.isArray(response.data) ? response.data : [])
     } catch (error) {
       console.error('Failed to fetch community posts:', error)
+      setPosts([])
     } finally {
       setIsLoading(false)
     }
@@ -71,17 +74,14 @@ export default function CommunityPage() {
 
       const response = await communityAPI.createPost(postData)
       setPosts([response.data, ...posts])
+      toast.success('Story shared with the community! 💛')
       
       // Reset form
-      setNewPost({
-        title: '',
-        text: '',
-        anonymous: false,
-        tags: ''
-      })
+      setNewPost({ title: '', text: '', anonymous: false, tags: '' })
       setShowNewPost(false)
     } catch (error) {
       console.error('Failed to create post:', error)
+      toast.error('Failed to share story. Please try again.')
     }
   }
 
@@ -129,12 +129,13 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <AppNav />
       {/* Background shapes */}
       <div className="floating-shape shape-1"></div>
       <div className="floating-shape shape-2"></div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10 p-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

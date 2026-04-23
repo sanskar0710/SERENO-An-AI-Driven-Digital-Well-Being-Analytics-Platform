@@ -64,11 +64,18 @@ export default function OnboardingPage() {
 
   const handleComplete = async () => {
     try {
-      await updateUser({ preferences })
+      // Save preferences to backend
+      await authAPI.updateMe({ preferences })
+      // Update local store
+      updateUser({ preferences } as any)
       toast.success('Onboarding completed! 🎉')
       router.push('/dashboard')
     } catch (error) {
-      toast.error('Failed to save preferences')
+      console.error('Failed to save preferences:', error)
+      // Still navigate even if save fails - preferences are in local state
+      updateUser({ preferences } as any)
+      toast.success('Preferences saved locally! 🎉')
+      router.push('/dashboard')
     }
   }
 
